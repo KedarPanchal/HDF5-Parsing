@@ -10,6 +10,7 @@ import tf2_ros
 import tf2_geometry_msgs
 import geometry_msgs.msg
 import argparse
+import time
 
 from collections import deque
 
@@ -48,12 +49,15 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
 
         uber_rgb_arr = []
         uber_depth_arr = []
+        action_depth_arr = []
         counter = 0
 
         bag_transformer = tf_bag.BagTfTransformer(bag)
 
 
         print(f"Sum: {sum(1 for _ in bag.read_messages())}")
+        t_prev = 0
+
         for topic, msg, t in bag.read_messages():
             counter += 1
             if counter % 6 == 0:
