@@ -1,6 +1,6 @@
 [
     {
-        "bag_name": "testfile1.bag",
+        "bag_name": "my_bagfile_compressed.bag",
         "group_name": "eavn",
         "operator_name": "evan",
         "time_stamp": "2024-07-02__10_03_58",
@@ -8,7 +8,7 @@
         "map_file": "hometest"
     },
     {
-        "bag_name": "testfile2.bag",
+        "bag_name": "testfile1.bag",
         "group_name": "eavn",
         "operator_name": "evan",
         "time_stamp": "2024-07-02__10_03_58",

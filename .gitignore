@@ -3,3 +3,5 @@
 **/**.bag.active
 **/**.hdf5
 HDF5-Parsing.code-workspace
+**/**.hdf5
+bariflex_stencil.py
