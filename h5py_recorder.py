@@ -19,7 +19,7 @@ import h5py
 
 from tf.transformations import quaternion_matrix
 from tf.transformations import euler_from_matrix
-# import tf_bag
+import tf_bag
 
 
 
@@ -77,12 +77,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 cv2.waitKey(1)
                 
             # actions
-            # elif topic == 'idk':
-                # bag_transformer = tf_bag.BagTfTransformer(bag)
-                # if t_prev == 0:
-                    # t_prev = t
-                # else:
-                    # translation, quaternion = bag_transformer.lookupTransform
+            bag_transformer = tf_bag.BagTfTransformer(bag)
 
         # creates the datasets
         print(np.array(uber_rgb_arr).shape)
