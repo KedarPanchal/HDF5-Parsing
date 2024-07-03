@@ -21,6 +21,8 @@ from tf.transformations import quaternion_matrix
 from tf.transformations import euler_from_matrix
 
 
+
+
 script_dir = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(script_dir, 'data')
 saved_mapping_dir = os.path.join(data_dir, "saved_mapping_bags")
