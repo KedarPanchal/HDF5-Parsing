@@ -66,7 +66,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
             # depth
             elif topic == '/camera/aligned_depth_to_color/image_raw/compressedDepth':
                 data = np.frombuffer(msg.data[12:], np.uint8)
-                cv_image = cv2.imdecode(data, cv2.IMREAD_COLOR)
+                cv_image = cv2.imdecode(data, cv2.IMREAD_GRAYSCALE)
                 cv_image = cv2.resize(cv_image, (320, 180), interpolation=cv2.INTER_AREA)
                 depth_arr = np.asarray(cv_image) # could also just be data but check to be sure
                 uber_depth_arr.append(depth_arr)
