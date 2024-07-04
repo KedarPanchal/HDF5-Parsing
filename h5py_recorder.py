@@ -22,6 +22,7 @@ from tf.transformations import quaternion_matrix
 from tf.transformations import quaternion_from_matrix
 
 import tf_bag
+import tf
 
 
 
@@ -52,14 +53,17 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
 
         bag_transformer = tf_bag.BagTfTransformer(bag)
 
+        trans = tf.Transformer(True, rospy.Duration(10.0))
 
-        print(f"Sum: {sum(1 for _ in bag.read_messages())}")
+
+        # print(f"Sum: {sum(1 for _ in bag.read_messages())}")
         t_prev = 0
 
         for topic, msg, t in bag.read_messages():
             # observations
             # color
             if topic == '/camera/color/image_raw/compressed':
+                # print(f"color: {t}")
                 try:
                     bridge = CvBridge()
                     cv_image = bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
@@ -72,16 +76,28 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                     rospy.logerr("CvBridge Error: {0}".format(e))
             # depth
             elif topic == '/camera/aligned_depth_to_color/image_raw/compressed':
+                # print(f"depth: {t}")
                 try:
-                    bridge = CvBridge()
-                    cv_image = bridge.compressed_imgmsg_to_cv2(msg, "bgr16")
-                    cv_image = cv2.resize(cv_image, (320, 180), interpolation=cv2.INTER_AREA)
-                    depth_arr = np.asarray(cv_image)
+                    data = np.frombuffer(msg.data, np.uint8)
+                    print(data)
+                    depth_image = cv2.imdecode(data, cv2.IMREAD_UNCHANGED)
+                    depth_image = cv2.resize(depth_image, (320, 180), interpolation=cv2.INTER_AREA)
+                    depth_arr = np.asarray(depth_image)
                     uber_depth_arr.append(depth_arr)
-                    # cv2.imshow("Color Image", cv_image)
-                    # cv2.waitKey(1)
+                    cv2.imshow("Depth Image", depth_image)
+                    cv2.waitKey(1)
                 except CvBridgeError as e:
                     rospy.logerr("CvBridge Error: {0}".format(e))
+                # try:
+                #     bridge = CvBridge()
+                #     cv_image = bridge.compressed_imgmsg_to_cv2(msg, "16UC1")
+                #     cv_image = cv2.resize(cv_image, (320, 180), interpolation=cv2.INTER_AREA)
+                #     depth_arr = np.asarray(cv_image)
+                #     uber_depth_arr.append(depth_arr)
+                #     # cv2.imshow("Color Image", cv_image)
+                #     # cv2.waitKey(1)
+                # except CvBridgeError as e:
+                #     rospy.logerr("CvBridge Error: {0}".format(e))
 
                 # data = np.frombuffer(msg.data[12:], np.uint8)
                 # cv_image = cv2.imdecode(data, cv2.IMREAD_COLOR)
@@ -90,12 +106,16 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 # uber_depth_arr.append(depth_arr)
                 # cv2.imshow("Depth Image", cv_image)
                 # cv2.waitKey(1)
+                # pass
                 
             # actions
             elif topic == '/tf':
                 # tf lookup
-                translation, quaternion = bag_transformer.lookupTransform('camera_link', 'map', t)
+                # print(f"tf: {t}")
+                # translation, quaternion = trans.lookupTransform('camera_link', 'map', t)
                 # idk how to compute 2 quaternions so just going to compute the pose and extract translation and quaternion!!
+                pass
+                '''                
                 mat = quaternion_matrix(quaternion)
                 transform_matrix = np.identity(4)
                 transform_matrix[:3, :3] = mat[:3, :3]
@@ -112,7 +132,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 prev_pose = transform_matrix
                 
                 # NOTE: saving just the translation and quaternion, can do the calcs using these later
-                uber_action_arr.append((translation, quaternion))
+                uber_action_arr.append((translation, quaternion))'''
                     
 
 
