@@ -19,10 +19,9 @@ from numpy.linalg import inv
 import h5py
 
 from tf.transformations import quaternion_matrix
-from tf.transformations import euler_from_matrix
+from tf.transformations import quaternion_from_matrix
 
 import tf_bag
-
 
 
 
@@ -49,7 +48,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
         uber_rgb_arr = []
         uber_depth_arr = []
         uber_action_arr = []
-        prev_frameid = None
+        prev_pose = None
 
         bag_transformer = tf_bag.BagTfTransformer(bag)
 
@@ -79,8 +78,8 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                     cv_image = cv2.resize(cv_image, (320, 180), interpolation=cv2.INTER_AREA)
                     depth_arr = np.asarray(cv_image)
                     uber_depth_arr.append(depth_arr)
-                    cv2.imshow("Color Image", cv_image)
-                    cv2.waitKey(1)
+                    # cv2.imshow("Color Image", cv_image)
+                    # cv2.waitKey(1)
                 except CvBridgeError as e:
                     rospy.logerr("CvBridge Error: {0}".format(e))
 
@@ -94,21 +93,36 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 
             # actions
             elif topic == '/tf':
-                # frameid = msg.header.frame_id
-                if prev_frameid is not None:
-                    translation, quaternion = bag_transformer.lookupTransform('camera_link', 'map', t)
+                # tf lookup
+                translation, quaternion = bag_transformer.lookupTransform('camera_link', 'map', t)
+                # idk how to compute 2 quaternions so just going to compute the pose and extract translation and quaternion!!
+                mat = quaternion_matrix(quaternion)
+                transform_matrix = np.identity(4)
+                transform_matrix[:3, :3] = mat[:3, :3]
+                transform_matrix[:3, 3] = translation[:3]
+
+                if prev_pose is not None:
+                    inv_prev = inv(prev_pose)
+                    rel_pose = np.matmul(inv_prev, transform_matrix)
                 else:
-                    translation, quaternion = (0,0,0),(0,0,0,1)
-                # print(translation, quaternion)
+                    rel_pose = transform_matrix
+
+                translation[:3] = rel_pose[:3, 3]
+                quaternion = quaternion_from_matrix(rel_pose[:3, :3])
+                prev_pose = transform_matrix
+                
+                # NOTE: saving just the translation and quaternion, can do the calcs using these later
+                uber_action_arr.append((translation, quaternion))
+                    
+
+
+
 
 
         # creates the datasets
         print(np.array(uber_rgb_arr).shape)
         print(np.array(uber_depth_arr).shape)
+        print(np.array(uber_action_arr).shape)
         color_dset = group.create_dataset(f"{name}: color images", data=np.array(uber_rgb_arr))
         depth_dset = group.create_dataset(f"{name}: depth images", data=np.array(uber_depth_arr))
-
-        for arr in uber_depth_arr[0]:
-            print(arr)
-
-        # TODO: action_dset = group.create_dataset(f"{name}: actions")
+        action_dset = group.create_dataset(f"{name}: actions", data=np.array(uber_action_arr))
