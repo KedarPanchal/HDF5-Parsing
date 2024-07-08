@@ -4,4 +4,9 @@
 **/**.hdf5
 HDF5-Parsing.code-workspace
 **/**.hdf5
-bariflex_stencil.py
+random_scripts/
+**/**.jpg
+**/**.png
+**/**.pyc
+**/**.py
+!h5py_recorder.py

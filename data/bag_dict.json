@@ -6,53 +6,5 @@
         "time_stamp": "2024-07-02__10_03_58",
         "task": "empty",
         "map_file": "hometest"
-    },
-    {
-        "bag_name": "testfile1.bag",
-        "group_name": "eavn",
-        "operator_name": "evan",
-        "time_stamp": "2024-07-02__10_03_58",
-        "task": "empty",
-        "map_file": "hometest"
-    },
-    {
-        "bag_name": "mapping_fifty_2024-07-02__15_26_42.bag",
-        "group_name": "group2",
-        "operator_name": "rohit",
-        "time_stamp": "2024-07-02__15_26_42",
-        "task": "first fifty",
-        "map_file": "fifty"
-    },
-    {
-        "bag_name": "mapping_dev_2024-07-02__15_29_51.bag",
-        "group_name": "group2",
-        "operator_name": "abba",
-        "time_stamp": "2024-07-02__15_29_51",
-        "task": "map",
-        "map_file": "dev"
-    },
-    {
-        "bag_name": "mapping_map_2024-07-02__15_46_17.bag",
-        "group_name": "group2",
-        "operator_name": "rohit",
-        "time_stamp": "2024-07-02__15_46_17",
-        "task": "empty",
-        "map_file": "map"
-    },
-    {
-        "bag_name": "mapping_actual_map_2024-07-02__15_47_52.bag",
-        "group_name": "s",
-        "operator_name": "rohit",
-        "time_stamp": "2024-07-02__15_47_52",
-        "task": "empty",
-        "map_file": "actual_map"
-    },
-    {
-        "bag_name": "mapping_finalmapforreal_2024-07-02__15_53_41.bag",
-        "group_name": "group2",
-        "operator_name": "rohit",
-        "time_stamp": "2024-07-02__15_53_41",
-        "task": "mapping it working",
-        "map_file": "finalmapforreal"
     }
 ]
