@@ -128,15 +128,18 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 # cv2.imshow("Depth Image", cv_image)
                 # cv2.waitKey(1)
                 # pass
-                
+
+   
             # actions
+            # gripper state
+            elif topic == '/bariflex':
+                pass
+            # transforms
             elif topic == '/tf':
                 # tf lookup
                 try: 
                     trans, quat = bag_transformer.lookupTransform('camera_link', 'map', t)
                     # idk how to compute 2 quaternions so just going to compute the pose and extract translation and quaternion!!
-
-
                     '''
                     # Quaternion subtraction is different from regular, element-wise subtraction
                     cq_x, cq_y, cq_z, cq_w = quat
@@ -164,8 +167,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                     prev_quat = quat
                     prev_trans = trans
                     
-                    # NOTE: saving just the translation and quaternion, can do the calcs using these later
-                    uber_action_arr.append((translation, quaternion))
+                    uber_action_arr.append([dt_x, dt_y, dt_z, dq_x, dq_y, dq_z, dq_w, baridata])
                     '''
                     if(colorDeque and depthDeque):
                         # uber_rgb_arr.append[colorDeque[-1*colorOffset]]
