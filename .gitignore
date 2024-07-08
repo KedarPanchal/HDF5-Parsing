@@ -5,7 +5,6 @@ __pycache__/
 **/**.hdf5
 HDF5-Parsing.code-workspace
 **/**.hdf5
-random_scripts/
 **/**.jpg
 **/**.png
 **/**.pyc
