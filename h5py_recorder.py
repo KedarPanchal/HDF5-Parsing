@@ -1,4 +1,5 @@
 import json
+import sys
 import os
 import rosbag
 import numpy as np
@@ -10,9 +11,8 @@ import tf2_ros
 import tf2_geometry_msgs
 import geometry_msgs.msg
 import argparse
-import time
 from collections import deque
-
+from tf import ExtrapolationException
 
 from numpy.linalg import inv
 
@@ -24,6 +24,7 @@ from tf.transformations import quaternion_from_matrix
 import tf_bag
 import tf
 
+rospy.set_param('use_sim_time', 'true')
 
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -49,7 +50,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
         uber_rgb_arr = []
         uber_depth_arr = []
         uber_action_arr = []
-        prev_pose = None
+
         prev_trans = None
         prev_quat = None
         test = 0
@@ -67,8 +68,13 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
 
         # print(f"Sum: {sum(1 for _ in bag.read_messages())}")
         t_prev = 0
+        i = 0
 
         for topic, msg, t in bag.read_messages():
+            i+=1 
+            if i == 1: 
+                t_first_tf = t
+
             # observations
             # color
             if topic == '/camera/color/image_raw/compressed':
@@ -126,53 +132,53 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
             # actions
             elif topic == '/tf':
                 # tf lookup
-                if msg.transforms[0].header.frame_id == "odom":
-                    test = test + 1
-                    print(f"tf: {test}")
-
-                # trans, quat = bag_transformer.lookupTransform('camera_link', 'map', t)
-                # idk how to compute 2 quaternions so just going to compute the pose and extract translation and quaternion!!
-                '''                
-                # Quaternion subtraction is different from regular, element-wise subtraction
-                curr_w, curr_x, curr_y, curr_z = quaternion
-                prev_w, prev_x, prev_y, prev_z = prev_quat
-
-                # Compute the conjugate of the previous orientation
-                prev_conj_w = prev_w
-                prev_conj_x = -prev_x
-                prev_conj_y = -prev_y
-                prev_conj_z = -prev_z
-
-                # Quaternion multiplication (prev_conjugate * current_orientation)
-                delta_w = prev_conj_w * curr_w - prev_conj_x * curr_x - prev_conj_y * curr_y - prev_conj_z * curr_z
-                delta_x = prev_conj_w * curr_x + prev_conj_x * curr_w + prev_conj_y * curr_z - prev_conj_z * curr_y
-                delta_y = prev_conj_w * curr_y - prev_conj_x * curr_z + prev_conj_y * curr_w + prev_conj_z * curr_x
-                delta_z = prev_conj_w * curr_z + prev_conj_x * curr_y - prev_conj_y * curr_x + prev_conj_z * curr_w
+                try: 
+                    trans, quat = bag_transformer.lookupTransform('camera_link', 'map', t)
+                    # idk how to compute 2 quaternions so just going to compute the pose and extract translation and quaternion!!
 
 
-                mat = quaternion_matrix(quaternion)
-                transform_matrix = np.identity(4)
-                transform_matrix[:3, :3] = mat[:3, :3]
-                transform_matrix[:3, 3] = translation[:3]
+                    '''
+                    # Quaternion subtraction is different from regular, element-wise subtraction
+                    cq_x, cq_y, cq_z, cq_w = quat
+                    pq_x, pq_y, pq_z, pq_w = prev_quat
 
-                if prev_pose is not None:
-                    inv_prev = inv(prev_pose)
-                    rel_pose = np.matmul(inv_prev, transform_matrix)
-                else:
-                    rel_pose = transform_matrix
+                    # Compute the conjugate of the previous orientation
+                    pq_conj_w = pq_w
+                    pq_conj_x = -pq_x
+                    pq_conj_y = -pq_y
+                    pq_conj_z = -pq_z
 
-                translation[:3] = rel_pose[:3, 3]
-                quaternion = quaternion_from_matrix(rel_pose[:3, :3])
-                prev_pose = transform_matrix
-                
-                # NOTE: saving just the translation and quaternion, can do the calcs using these later
-                uber_action_arr.append((translation, quaternion))
-                '''
-                if(colorDeque and depthDeque):
-                    uber_rgb_arr.append[-colorDeque]
-                    uber_depth_arr.append[-depthDeque]
-                    colorDeque = 0
-                    depthDeque = 0
+                    # Quaternion multiplication (prev_conjugate * current_orientation)
+                    dq_w = pq_conj_w * cq_w - pq_conj_x * cq_x - pq_conj_y * cq_y - pq_conj_z * cq_z
+                    dq_x = pq_conj_w * cq_x + pq_conj_x * cq_w + pq_conj_y * cq_z - pq_conj_z * cq_y
+                    dq_y = pq_conj_w * cq_y - pq_conj_x * cq_z + pq_conj_y * cq_w + pq_conj_z * cq_x
+                    dq_z = pq_conj_w * cq_z + pq_conj_x * cq_y - pq_conj_y * cq_x + pq_conj_z * cq_w
+
+                    ct_x, ct_y, ct_z = trans
+                    pt_x, pt_y, pt_z = prev_trans
+
+                    dt_x = ct_x - pt_x
+                    dt_y = ct_y - pt_y
+                    dt_z = ct_z - pt_z
+
+                    prev_quat = quat
+                    prev_trans = trans
+                    
+                    # NOTE: saving just the translation and quaternion, can do the calcs using these later
+                    uber_action_arr.append((translation, quaternion))
+                    '''
+                    if(colorDeque and depthDeque):
+                        # uber_rgb_arr.append[colorDeque[-1*colorOffset]]
+                        # uber_depth_arr.append[depthDeque[-1*depthOffset]]
+                        # colorOffset = 0
+                        # depthOffset = 0
+                        pass
+                    
+                except ExtrapolationException as e:
+                    print(type(e))
+                    continue
+                    # print(f"Exception {e}", file=sys.stderr)
+          
                     
 
 

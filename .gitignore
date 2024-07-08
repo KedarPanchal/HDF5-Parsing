@@ -1,6 +1,7 @@
 __pycache__/
 random_scripts/
 build/
+build/*
 devel/
 src/
 
