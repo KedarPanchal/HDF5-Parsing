@@ -9,6 +9,7 @@ RUN apt-get install -y ros-noetic-cv-bridge ros-noetic-vision-opencv
 RUN apt-get install -y ros-noetic-tf ros-noetic-tf2-geometry-msgs 
 RUN apt-get install -y git
 RUN apt-get install -y python3-pip
+RUN apt-get install libhdf5-dev
 # RUN apt-get install -y catkin
 
 # Switch the shell to bash because /bin/sh can't source ROS .bash scripts
