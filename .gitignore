@@ -4,6 +4,7 @@ build/
 build/*
 devel/
 src/
+;C/
 
 **/.DS_Store
 **/**.bag
