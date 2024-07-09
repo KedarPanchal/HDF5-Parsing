@@ -7,10 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y ros-noetic-cv-bridge ros-noetic-vision-opencv
 RUN apt-get install -y ros-noetic-tf ros-noetic-tf2-geometry-msgs 
+RUN apt-get install -y git
 RUN apt-get install -y python3-pip
-RUN apt-get install -y catkin
+# RUN apt-get install -y catkin
 
-# Switch the shell to bash because /bin/sh doesn't have source for some odd reason
+# Switch the shell to bash because /bin/sh can't source ROS .bash scripts
 SHELL ["/bin/bash", "-c"]
 # Setup bashrc to get ros working and nice
 RUN source /opt/ros/noetic/setup.bash
@@ -20,5 +21,12 @@ RUN echo "alias pip=pip3" >> ~/.bashrc
 RUN echo "roscore &" >> ~/.bashrc
 RUN source ~/.bashrc
 
-# Install required python packages onto the docker container
+# Install required python packages onto the docker image
 RUN pip install h5py
+
+# Set up the tf_bag library in the /usr/share/hdf5_parse workspace
+WORKDIR /usr/share/hdf5_parse/src
+RUN git clone "https://github.com/IFL-CAMP/tf_bag.git"
+WORKDIR /usr/share/hdf5_parse
+RUN rosdep install -ryi --from-paths . --ignore-src
+RUN source /opt/ros/noetic/setup.bash && catkin_make
