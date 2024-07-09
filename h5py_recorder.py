@@ -53,6 +53,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
         uber_rgb_arr = []
         uber_depth_arr = []
         uber_action_arr = []
+        uber_bari_arr = []
 
         prev_pose = None
         deltaTrans = [0, 0, 0]
@@ -77,7 +78,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
 
             # observations
             # color
-            if topic == '/camera/color/image_raw/compressed':
+            if topic == '/camera/color/image_raw':
                 rgb_arr = h5h.colorImageCallback(msg)
                 colorList.append(rgb_arr)
                 colorOffset += 1
@@ -117,8 +118,11 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
             elif topic == '/bariflex':
                 # bariflex topic has strings with the data we want
                 # regex to parse the "destination" of the gripper (the position wouldn't give us what we want)
-                bariDes = float(re.match(r"des:(-\d+\.\d+)", msg.data).group(1))
-                bariList.append(bariDes)
+                print(msg.data)
+                regex = [float(x) for x in re.finditer(r"-{0,1}\d+\.\d+", msg.data)]
+                bariList.append(regex[0])
+                # saves
+                uber_bari_arr.append(regex)
                 bariOffset += 1
 
             
@@ -154,6 +158,9 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
         print(np.array(uber_rgb_arr).shape)
         print(np.array(uber_depth_arr).shape)
         print(np.array(uber_action_arr).shape)
+        print(np.array(uber_bari_arr).shape)
+        
         color_dset = group.create_dataset(f"{name}: color images", data=np.array(uber_rgb_arr))
         depth_dset = group.create_dataset(f"{name}: depth images", data=np.array(uber_depth_arr))
+        bari_dset = group.create_dataset(f"{name}: bariflex data", data=np.array(uber_bari_arr))
         action_dset = group.create_dataset(f"{name}: actions", data=np.array(uber_action_arr))

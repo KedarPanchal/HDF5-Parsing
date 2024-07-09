@@ -33,7 +33,7 @@ deltaQuat = [0, 0, 0, 1]
 def colorImageCallback(data):
     try:
         bridge = CvBridge()
-        cv_image = bridge.compressed_imgmsg_to_cv2(data, "bgr8")
+        cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
         cv_image = cv2.resize(cv_image, (320, 180), interpolation=cv2.INTER_AREA)
         rgb_arr = np.asarray(cv_image)
 
