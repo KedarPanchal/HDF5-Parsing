@@ -87,7 +87,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 # cv2.waitKey(1)
 
             # depth
-            elif topic == 'camera/aligned_depth_to_color/image_raw':
+            elif topic == '/camera/aligned_depth_to_color/image_raw':
                 depth_arr = h5h.depthImageCallback(msg)
                 depthList.append(depth_arr)
                 depthOffset += 1
@@ -118,8 +118,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
             elif topic == '/bariflex':
                 # bariflex topic has strings with the data we want
                 # regex to parse the "destination" of the gripper (the position wouldn't give us what we want)
-                print(msg.data)
-                regex = [float(x) for x in re.finditer(r"-{0,1}\d+\.\d+", msg.data)]
+                regex = [float(x.group()) for x in re.finditer(r"-{0,1}\d+\.\d+", msg.data)]
                 bariList.append(regex[0])
                 # saves
                 uber_bari_arr.append(regex)
@@ -131,8 +130,8 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
                 try: 
                     # tf lookup
                     trans, quat = bag_transformer.lookupTransform('camera_link', 'map', t)
-
-                    if(len(colorList) != 0 and len(depthList) != 0 and len(bariList) != 0):
+                    print("HERE")
+                    if len(colorList) > 0:
                         
                         deltaTrans, deltaQuat = h5h.actionCallback(trans, quat)
 
