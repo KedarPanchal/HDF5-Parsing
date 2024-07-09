@@ -44,6 +44,7 @@ with open(os.path.join(data_dir, 'bag_dict.json')) as f, h5py.File(os.path.join(
         try:
             bag = rosbag.Bag(os.path.join(data_dir, name))
         except FileNotFoundError:
+            print(f"{name} not found, continuing")
             continue
 
         # create hdf5 group for bag
