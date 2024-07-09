@@ -1,4 +1,20 @@
+# Extend ROS Dockerfile
 FROM ros:noetic
+# Don't prompt for anything
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package repository and download necessary ros packages (say yes to everything!)
 RUN apt-get update
-RUN apt-get install -yq --no-install-recommends
+RUN apt-get install -y ros-noetic-cv-bridge ros-noetic-vision-opencv
+RUN apt-get install -y ros-noetic-tf ros-noetic-tf2-geometry-msgs 
+
+# Switch the shell to bash because /bin/sh doesn't have source for some odd reason
+SHELL ["/bin/bash", "-c"]
+# Setup bashrc to get ros working and nice
+RUN source /opt/ros/noetic/setup.bash
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "alias python=python3" >> ~/.bashrc
+RUN echo "roscore &" >> ~/.bashrc
+RUN source ~/.bashrc
+
+# TODO Get pip installs working on the dockerfile
