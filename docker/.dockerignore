@@ -1,0 +1,7 @@
+__pycache__
+docker
+.gitattributes
+.gitignore
+nobagplayparsing.py
+record_SLAM_Gripper.py
+replay_SLAM.bash
