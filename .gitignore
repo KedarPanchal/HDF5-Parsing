@@ -13,7 +13,7 @@ src/
 **/**.png
 **/**.pyc
 **/**.py
-
+replay_SLAM.bash
 HDF5-Parsing.code-workspace
 
 !h5py_recorder.py
