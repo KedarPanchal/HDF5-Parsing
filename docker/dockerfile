@@ -7,6 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y ros-noetic-cv-bridge ros-noetic-vision-opencv
 RUN apt-get install -y ros-noetic-tf ros-noetic-tf2-geometry-msgs 
+RUN apt-get install -y python3-pip
+RUN apt-get install -y catkin
 
 # Switch the shell to bash because /bin/sh doesn't have source for some odd reason
 SHELL ["/bin/bash", "-c"]
@@ -14,7 +16,9 @@ SHELL ["/bin/bash", "-c"]
 RUN source /opt/ros/noetic/setup.bash
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 RUN echo "alias python=python3" >> ~/.bashrc
+RUN echo "alias pip=pip3" >> ~/.bashrc
 RUN echo "roscore &" >> ~/.bashrc
 RUN source ~/.bashrc
 
-# TODO Get pip installs working on the dockerfile
+# Install required python packages onto the docker container
+RUN pip install h5py
