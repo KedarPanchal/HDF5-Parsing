@@ -9,7 +9,6 @@ src/
 **/**.bag
 **/**.bag.active
 **/**.hdf5
-**/**.hdf5
 **/**.jpg
 **/**.png
 **/**.pyc
@@ -18,3 +17,4 @@ src/
 HDF5-Parsing.code-workspace
 
 !h5py_recorder.py
+!h5py_helper.py
