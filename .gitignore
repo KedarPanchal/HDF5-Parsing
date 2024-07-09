@@ -5,6 +5,7 @@ build/*
 devel/
 src/
 ;C/
+dummy/
 
 **/.DS_Store
 **/**.bag
