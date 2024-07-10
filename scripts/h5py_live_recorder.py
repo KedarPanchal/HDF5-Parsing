@@ -114,7 +114,7 @@ def listener():
             else:
                 rel_pose = transform_matrix
             prev_pose = transform_matrix
-            translation = transform_matrix[:3, 3]
+            translation[:3] = transform_matrix[:3, 3]
             quaternion = quaternion_from_matrix(transform_matrix)
             # record the relative pose together with the most recent depth and color image received by subscribers
             uber_color_arr.append[color_list[-1 * color_offset]]
