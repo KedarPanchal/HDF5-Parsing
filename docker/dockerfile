@@ -19,14 +19,14 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 RUN echo "alias python=python3" >> ~/.bashrc
 RUN echo "alias pip=pip3" >> ~/.bashrc
 RUN echo "roscore &" >> ~/.bashrc
+RUN echo "source /usr/share/hdf5_parse/devel/setup.bash" >> ~/.bashrc
 RUN source ~/.bashrc
 
 # Install required python packages onto the docker image
 RUN pip install h5py
 
 # Set up the tf_bag library in the /usr/share/hdf5_parse workspace
-WORKDIR /usr/share/hdf5_parse/src
-RUN git clone "https://github.com/IFL-CAMP/tf_bag.git"
-WORKDIR /usr/share/hdf5_parse
-RUN rosdep install -ryi --from-paths . --ignore-src
-RUN source /opt/ros/noetic/setup.bash && catkin_make
+WORKDIR /usr/share/hdf5_parse/
+ADD scripts/make_catkin.bash /usr/share/hdf5_parse/
+RUN chmod +x make_catkin.bash
+CMD /bin/bash -c "./make_catkin.bash; /bin/bash"

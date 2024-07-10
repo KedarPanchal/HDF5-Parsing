@@ -3,7 +3,7 @@ param(
     [string]$cname=$null
 )
 
-docker build -t "hdf5_parse" docker/
+docker build -t "hdf5_parse" -f docker/dockerfile .
 
 if  (!$cname) {
     docker run -v "${PSCommandPath}/:/usr/share/hdf5_parse" --name $cname -it "hdf5_parse"
