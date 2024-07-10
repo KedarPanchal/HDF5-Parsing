@@ -18,6 +18,4 @@ dummy/
 replay_SLAM.bash
 HDF5-Parsing.code-workspace
 
-!h5py_recorder.py
-!h5py_helper.py
-!simulated_data_recorder.py
+!scripts/*.py
